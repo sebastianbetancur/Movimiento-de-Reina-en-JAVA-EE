@@ -32,11 +32,11 @@ public class ControladorAjedrez implements Serializable {
     public List<Coordenada> getPosicion() {
         return posicion;
     }
-    
+
     public void setPosicion(List<Coordenada> posicion) {
         this.posicion = posicion;
     }
-    
+
     public void posicionarFicha(int fila, int columna) { // Metodo que adiciona coordenada 
         //y validad que no se sobreponga y que tampoco se cruze con otras en la misma fila ó columna
         boolean validarCordenada = true;
@@ -48,10 +48,12 @@ public class ControladorAjedrez implements Serializable {
                 }
             }
             if (validarCordenada) {
-                if (validarPosicionesEnFila(fila)) {
-                    if (validarPosicionesEnColumna(columna)) {
-                        posicion.add(new Coordenada((byte) fila, (byte) columna));
-                        JsfUtil.addSuccessMessage("Posicion guardada: " + fila + "." + columna);
+                if (validarPosicionesEnDiagonal(fila, columna)) {
+                    if (validarPosicionesEnFila(fila)) {
+                        if (validarPosicionesEnColumna(columna)) {
+                            posicion.add(new Coordenada((byte) fila, (byte) columna));
+                            JsfUtil.addSuccessMessage("Posicion guardada: " + fila + "." + columna);
+                        }
                     }
                 }
             }
@@ -60,9 +62,9 @@ public class ControladorAjedrez implements Serializable {
             JsfUtil.addSuccessMessage("Posicion guardada: " + fila + "." + columna);
         }
     }
-    
+
     public String pintarPosicion(int fila, int columna) {//Metodo que me permite pintar la ficha de la reina
-        
+
         for (Coordenada coordenada : posicion) {
             if (coordenada.getFila() == fila && coordenada.getColumna() == columna) {
                 return "width: 100px; height: 50px; background-image: url('reinaAjedrez.png'); background-size: cover";
@@ -73,7 +75,7 @@ public class ControladorAjedrez implements Serializable {
         }
         return "width: 100px; height: 50px;";
     }
-    
+
     public boolean validarPosicionesEnFila(int fila) {//Metodo que valida en todas las columnas
         for (Coordenada coordenada : posicion) {
             if (fila == coordenada.getFila()) {
@@ -83,7 +85,7 @@ public class ControladorAjedrez implements Serializable {
         }
         return true;
     }
-    
+
     public boolean validarPosicionesEnColumna(int columna) {//Metodo que valida en todas las filas
         for (Coordenada coordenada : posicion) {
             if (columna == coordenada.getColumna()) {
@@ -93,5 +95,62 @@ public class ControladorAjedrez implements Serializable {
         }
         return true;
     }
-    
+
+    public boolean validarPosicionesEnDiagonal(int fila, int columna) {
+        int i = fila;
+        int j = columna;
+        for (Coordenada coordenada : posicion) {
+            while (i <= 8 || j <= 8) {
+                if (coordenada.getFila() == i && coordenada.getColumna() == j) {
+                    JsfUtil.addErrorMessage("Ya tiene otra reina en diagonal");
+                    return false;
+                }
+                i++;
+                j++;
+            }
+            i = fila;
+            j = columna;
+        }
+
+        for (Coordenada coordenada : posicion) {
+            while (i >= 1 || j >= 1) {
+                if (coordenada.getFila() == i && coordenada.getColumna() == j) {
+                    JsfUtil.addErrorMessage("Ya tiene otra reina en diagonal");
+                    return false;
+                }
+                i--;
+                j--;
+            }
+            i = fila;
+            j = columna;
+        }
+
+        for (Coordenada coordenada : posicion) {
+            while (i <= 8 || j >= 8) {
+                if (coordenada.getFila() == i && coordenada.getColumna() == j) {
+                    JsfUtil.addErrorMessage("Ya tiene otra reina en diagonal");
+                    return false;
+                }
+                i++;
+                j--;
+            }
+            i = fila;
+            j = columna;
+        }
+
+        for (Coordenada coordenada : posicion) {
+            while (i >= 8 || j <= 8) {
+                if (coordenada.getFila() == i && coordenada.getColumna() == j) {
+                    JsfUtil.addErrorMessage("Ya tiene otra reina en diagonal");
+                    return false;
+                }
+                i--;
+                j++;
+            }
+            i = fila;
+            j = columna;
+        }
+
+        return true;
+    }
 }
